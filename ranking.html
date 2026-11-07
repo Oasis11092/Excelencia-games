@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ranking | Macacada Games</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon-64.png">
+<link rel="apple-touch-icon" href="icone-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Macacada">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<meta name="theme-color" content="#14241A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1C1410;--cream:#FFF6DE;--red:#E3362B;--gold:#FFC21F;--bg:#14241A;--card:#1E3424;--line:#3E6A48;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14241A}}
+:root[data-theme="dark"]{--bg:#14241A}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0;min-height:100%}
+body{background:var(--bg) radial-gradient(ellipse at 50% -10%,#2E5A38,transparent 60%) no-repeat;color:var(--cream);font-family:"Lilita One","Arial Rounded MT Bold","Trebuchet MS",sans-serif}
+button,a{font:inherit;color:inherit}
+button{border:0;cursor:pointer}
+:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.app{width:min(100%,640px);margin:0 auto;padding:14px 14px 30px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{margin:0;font-weight:400;font-size:clamp(1.8rem,8vw,2.6rem);color:var(--gold);text-shadow:0 3px 0 var(--red),0 6px 0 var(--ink)}
+.btn{display:inline-flex;align-items:center;min-height:42px;padding:.15em .9em .05em;border-radius:12px;background:var(--cream);color:var(--ink);border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);text-decoration:none;font-size:1rem}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.tabs button{min-height:42px;padding:.15em .8em .05em;border-radius:12px;background:var(--card);border:3px solid var(--line);font-size:1rem}
+.tabs button[aria-pressed="true"]{background:var(--gold);color:var(--ink);border-color:var(--ink)}
+.box{padding:12px;border-radius:18px;background:var(--card);border:3px solid var(--line)}
+.box h2{margin:0 0 6px;font-weight:400;font-size:1.3rem}
+.box p{margin:0 0 8px;font-family:"Trebuchet MS",sans-serif;font-weight:700;font-size:.9rem;opacity:.8}
+ol{margin:0;padding:0;list-style:none;font-family:"Trebuchet MS",sans-serif;font-weight:800}
+li{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:8px;padding:8px 6px;border-bottom:2px solid rgba(255,246,222,.12)}
+li:nth-child(1) span:first-child{color:#FFD23F}li:nth-child(2) span:first-child{color:#D8D8E0}li:nth-child(3) span:first-child{color:#E0A060}
+.empty{display:block;text-align:center;opacity:.7}
+</style>
+</head>
+<body>
+<div id="mcLoad" aria-live="polite" style="position:fixed;inset:0;z-index:999;background:#14241A;color:#FFF6DE;font-family:'Lilita One','Arial Rounded MT Bold','Trebuchet MS',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s">
+<div style="font-size:clamp(1.6rem,6vw,2.4rem);color:#FFC21F;text-shadow:0 3px 0 #E3362B,0 6px 0 #1C1410">Carregando<span id="mcDots">...</span></div>
+<div style="width:min(70vw,320px);height:16px;border-radius:9px;background:#0E1A12;border:2px solid #3E6A48;overflow:hidden"><i id="mcBar" style="display:block;height:100%;width:5%;background:linear-gradient(90deg,#F2B81E,#FFE27A);transition:width .3s"></i></div>
+<p id="mcTip" style="margin:0;max-width:min(80vw,420px);text-align:center;font-family:'Trebuchet MS',sans-serif;font-weight:700;font-size:clamp(.9rem,3.6vw,1.05rem);opacity:.85;line-height:1.35"></p>
+<canvas id="mcCafe" width="44" height="46" style="position:absolute;right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));width:clamp(132px,min(28vw,34vh),220px);height:auto;image-rendering:pixelated" aria-label="Gorila tomando café enquanto carrega"></canvas>
+</div>
+<script>
+(function(){var el=document.getElementById("mcLoad"),bar=document.getElementById("mcBar"),dots=document.getElementById("mcDots"),cv=document.getElementById("mcCafe"),g=cv.getContext("2d"),img=new Image(),t0=performance.now(),p=5,done=false,steam=[];
+var TIPS=["Dica: pule em cima dos bichos para derrotá-los!","Dica: as bananas vão para a sua carteira.","Dica: no app, dá para comprar chapéus e óculos.","Dica: segure o pulo para pular mais alto.","Dica: nas curvas do kart, segure para o lado da curva!","Dica: junte bananas para ganhar prêmios exclusivos."];
+document.getElementById("mcTip").textContent=TIPS[Math.floor(Math.random()*TIPS.length)];
+img.src="data:image/png;base64,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";g.imageSmoothingEnabled=false;
+var SEQ=[[0,1.3],[1,.25],[2,.9],[3,.7]],tot=SEQ.reduce(function(a,b){return a+b[1]},0);
+function frameAt(t){var s=t%tot;for(var i=0;i<SEQ.length;i++){if(s<SEQ[i][1])return SEQ[i][0];s-=SEQ[i][1]}return 0}
+function loop(now){if(done&&el.style.opacity==="0")return;requestAnimationFrame(loop);var t=(now-t0)/1000;
+  dots.textContent=".".repeat(1+Math.floor(t*2.5)%3);if(!done){p+=(92-p)*.02;bar.style.width=p+"%"}
+  g.clearRect(0,0,44,46);var fr=frameAt(t);if(img.complete&&img.naturalWidth)g.drawImage(img,fr*44,0,44,46,0,0,44,46);
+  var mx=[19,19,20,19][fr],my=[27,21,14,21][fr];if(fr!==2&&Math.random()<.2)steam.push({x:mx+Math.random()*6,y:my,a:1});
+  steam.forEach(function(s){s.y-=.22;s.x+=Math.sin((s.y+t*12)/3)*.25;s.a-=.012;g.fillStyle="rgba(225,225,235,"+Math.max(0,s.a)*.75+")";g.fillRect(Math.round(s.x),Math.round(s.y),1,1)});steam=steam.filter(function(s){return s.a>0&&s.y>0})}
+requestAnimationFrame(loop);
+function finish(){var wait=Math.max(0,1400-(performance.now()-t0));setTimeout(function(){done=true;bar.style.width="100%";setTimeout(function(){el.style.opacity="0";setTimeout(function(){el.remove()},450)},300)},wait)}
+if(document.readyState==="complete")finish();else addEventListener("load",finish);
+})();
+</script>
+<div class="app">
+  <div class="top"><a class="btn" href="index.html#menu">◀ Menu</a><h1>🏆 Ranking</h1></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="box"><h2 id="tName"></h2><p id="tNote"></p><ol id="list"></ol></div>
+</div>
+<script src="config.js"></script>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function rd(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
+var CFG=window.CLUBE_ONLINE||{},online=!!(CFG.url&&CFG.key&&CFG.url.indexOf("SEU-PROJETO")<0);
+var T=[
+ {n:"🦍 Macaco no deserto",note:online?"Ranking do clube, online.":"Ranking deste aparelho.",load:function(cb){if(!online){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}));return}
+   fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/ranking?select=apelido,pontos&order=pontos.desc,id.asc&limit=10",{headers:{apikey:CFG.key}}).then(function(r){return r.json()}).then(function(d){cb(d.map(function(r){return[r.apelido,r.pontos+" pts"]}))}).catch(function(){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}),"Sem internet: mostrando o ranking deste aparelho.")})}},
+ {n:"🐒 Pulo ao Infinito",note:"Ranking deste aparelho.",load:function(cb){cb(rd("pulo-ranking").map(function(r){return[r.n,r.m+" m"]}))}},
+ {n:"🏁 Kart da Macacada",note:"Ranking deste aparelho.",load:function(cb){cb(rd("kart-ranking").map(function(r){return[r.n,r.p+" pts"]}))}},
+ {n:"🐍 Chefões: Fase 1",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-f1").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}},
+ {n:"🐍 Chefões: Fase 2",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-f2").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}},
+ {n:"🐍 Chefões: Chefão",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-boss").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}}
+];
+var cur=0;
+function paint(){Array.prototype.forEach.call($("tabs").children,function(b,i){b.setAttribute("aria-pressed",i===cur?"true":"false")});
+  var t=T[cur];$("tName").textContent=t.n;$("tNote").textContent=t.note;$("list").innerHTML="<li class='empty'>Carregando...</li>";
+  t.load(function(rows,msg){if(msg)$("tNote").textContent=msg;var ol=$("list");ol.innerHTML="";if(!rows.length){var e=document.createElement("li");e.className="empty";e.textContent="Ninguém no ranking ainda.";ol.appendChild(e);return}
+    rows.slice(0,10).forEach(function(r,i){var li=document.createElement("li");[(i+1)+".",r[0],r[1]].forEach(function(x){var s=document.createElement("span");s.textContent=x;li.appendChild(s)});ol.appendChild(li)})})}
+T.forEach(function(t,i){var b=document.createElement("button");b.type="button";b.textContent=t.n;b.addEventListener("click",function(){cur=i;paint()});$("tabs").appendChild(b)});
+paint();
+})();
+</script>
+</body>
+</html>
