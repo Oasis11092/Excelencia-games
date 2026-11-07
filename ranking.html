@@ -78,18 +78,22 @@ if(document.readyState==="complete")finish();else addEventListener("load",finish
 var $=function(i){return document.getElementById(i)};
 function rd(k){try{return JSON.parse(localStorage.getItem(k)||"[]")}catch(e){return[]}}
 var CFG=window.CLUBE_ONLINE||{},online=!!(CFG.url&&CFG.key&&CFG.url.indexOf("SEU-PROJETO")<0);
+function onl(jogo,local,fmt){return function(cb){var loc=rd(local).map(fmt);if(!online){cb(loc,"Ranking deste aparelho.");return}
+  fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/rpc/top_jogo",{method:"POST",headers:{apikey:CFG.key,"Content-Type":"application/json"},body:JSON.stringify({p_jogo:jogo})}).then(function(x){if(!x.ok)throw 0;return x.json()}).then(function(d){cb(d.map(function(z){return[z.apelido,z.pontos+(jogo==="pulo"?" m":" pts")]}),"Ranking do clube, online.")}).catch(function(){cb(loc,"Sem conexão com o ranking do clube: mostrando este aparelho.")})}}
 var T=[
- {n:"🦍 Macaco no deserto",note:online?"Ranking do clube, online.":"Ranking deste aparelho.",load:function(cb){if(!online){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}));return}
-   fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/ranking?select=apelido,pontos&order=pontos.desc,id.asc&limit=10",{headers:{apikey:CFG.key}}).then(function(r){return r.json()}).then(function(d){cb(d.map(function(r){return[r.apelido,r.pontos+" pts"]}))}).catch(function(){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}),"Sem internet: mostrando o ranking deste aparelho.")})}},
- {n:"🐒 Pulo ao Infinito",note:"Ranking deste aparelho.",load:function(cb){cb(rd("pulo-ranking").map(function(r){return[r.n,r.m+" m"]}))}},
- {n:"🏁 Kart da Macacada",note:"Ranking deste aparelho.",load:function(cb){cb(rd("kart-ranking").map(function(r){return[r.n,r.p+" pts"]}))}},
- {n:"🐍 Chefões: Fase 1",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-f1").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}},
- {n:"🐍 Chefões: Fase 2",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-f2").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}},
- {n:"🐍 Chefões: Chefão",note:"Ranking deste aparelho.",load:function(cb){cb(rd("tico-rank-boss").map(function(r){return[r.n,r.s+" pts · "+r.g]}))}}
+ {n:"🦍 Macaco no deserto",note:"",load:function(cb){if(!online){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}),"Ranking deste aparelho.");return}
+   fetch(CFG.url.replace(/\/$/,"")+"/rest/v1/ranking?select=apelido,pontos&order=pontos.desc,id.asc&limit=10",{headers:{apikey:CFG.key}}).then(function(r){return r.json()}).then(function(d){cb(d.map(function(r){return[r.apelido,r.pontos+" pts"]}),"Ranking do clube, online.")}).catch(function(){cb(rd("roleta-ranking").map(function(r){return[r.n,r.s+" pts"]}),"Sem internet: mostrando o ranking deste aparelho.")})}},
+ {n:"🌴 Macaco na Selva",load:onl("selva","selva-ranking",function(x){return[x.n,x.p+" pts"]})},
+ {n:"🏃 Corre, Macaco!",load:onl("corre","corre-ranking",function(x){return[x.n,x.p+" pts"]})},
+ {n:"🐒 Pulo ao Infinito",load:onl("pulo","pulo-ranking",function(x){return[x.n,x.m+" m"]})},
+ {n:"🏁 Kart da Macacada",load:onl("kart","kart-ranking",function(x){return[x.n,x.p+" pts"]})},
+ {n:"🐍 Chefões: Fase 1",load:onl("chefoes_f1","tico-rank-f1",function(x){return[x.n,x.s+" pts"]})},
+ {n:"🐍 Chefões: Fase 2",load:onl("chefoes_f2","tico-rank-f2",function(x){return[x.n,x.s+" pts"]})},
+ {n:"🐍 Chefões: Chefão",load:onl("chefoes_boss","tico-rank-boss",function(x){return[x.n,x.s+" pts"]})}
 ];
 var cur=0;
 function paint(){Array.prototype.forEach.call($("tabs").children,function(b,i){b.setAttribute("aria-pressed",i===cur?"true":"false")});
-  var t=T[cur];$("tName").textContent=t.n;$("tNote").textContent=t.note;$("list").innerHTML="<li class='empty'>Carregando...</li>";
+  var t=T[cur];$("tName").textContent=t.n;$("tNote").textContent=t.note||"";$("list").innerHTML="<li class='empty'>Carregando...</li>";
   t.load(function(rows,msg){if(msg)$("tNote").textContent=msg;var ol=$("list");ol.innerHTML="";if(!rows.length){var e=document.createElement("li");e.className="empty";e.textContent="Ninguém no ranking ainda.";ol.appendChild(e);return}
     rows.slice(0,10).forEach(function(r,i){var li=document.createElement("li");[(i+1)+".",r[0],r[1]].forEach(function(x){var s=document.createElement("span");s.textContent=x;li.appendChild(s)});ol.appendChild(li)})})}
 T.forEach(function(t,i){var b=document.createElement("button");b.type="button";b.textContent=t.n;b.addEventListener("click",function(){cur=i;paint()});$("tabs").appendChild(b)});
