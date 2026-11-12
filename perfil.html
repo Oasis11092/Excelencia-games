@@ -356,7 +356,7 @@ var ACCF={hat:{w:64,h:64,c:5,l:["bone","gorro","boina","explorador","festa","car
 function accDraw(g,kind,id,x,y,w){var im=ACCI[kind],f=ACCF[kind],i=f.l.indexOf(id);if(i<0&&kind==="sc"){var L=MAC.SCARVES;for(var q=0;q<L.length;q++)if(L[q][0]===id)i=q}if(i<0||!(im.complete&&im.naturalWidth))return;g.imageSmoothingEnabled=false;g.drawImage(im,(i%f.c)*f.w,Math.floor(i/f.c)*f.h,f.w,f.h,x,y,w,w*f.h/f.w)}
 function accIcon(cv,tab,v,on){var kind=tab==="hat"?"hat":tab==="glasses"?"gl":"sc",f=ACCF[kind],g=cv.getContext("2d"),go=function(){g.clearRect(0,0,cv.width,cv.height);var w=kind==="gl"?70:kind==="hat"?64:56,h=w*f.h/f.w;accDraw(g,kind,v,(cv.width-w)/2,(cv.height-h)/2,w)};if(ACCI[kind].complete&&ACCI[kind].naturalWidth)go();else ACCI[kind].addEventListener("load",go)}
 function drawTo(cv,p,fr){if(cv.width!==96){cv.width=96;cv.height=96}var g=cv.getContext("2d");g.clearRect(0,0,96,96);var im=MAC.portrait?MAC.portrait(p.hero):null;
-  if(im&&im.complete&&im.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(im,0,fr?1:0,96,95);if(p.scarf)accDraw(g,"sc",p.scarf,26,64,44);if(p.glasses)accDraw(g,"gl",p.glasses,24,34,48);if(p.hat)accDraw(g,"hat",p.hat,22,-6,52)}
+  if(im&&im.complete&&im.naturalWidth){g.imageSmoothingEnabled=false;g.drawImage(im,0,fr?1:0,96,95)}
   else MAC.draw(g,fr,36,cv.height-2,1.6,1,p)}
 var t0=0;
 function anim(t){requestAnimationFrame(anim);if(t-t0<220)return;t0=t;var fr=reduced?0:Math.floor(t/220)%2;var p=MAC.prof();if(!$("home").hidden)drawTo($("heroCv"),p,fr);if(!$("shop").hidden)drawTo($("bigCv"),p,fr)}
@@ -467,6 +467,6 @@ MAC.ready(function(){paint()});paint();requestAnimationFrame(anim);
 function hashGo(){if(location.hash==="#loja"){tab="hat";show("shop");paintShop()}}hashGo();addEventListener("hashchange",hashGo);
 })();
 </script>
-<p id="appVer" style="position:fixed;left:6px;bottom:4px;margin:0;font:11px sans-serif;opacity:.45;z-index:1;pointer-events:none">versão 12/11 a</p>
+<p id="appVer" style="position:fixed;left:6px;bottom:4px;margin:0;font:11px sans-serif;opacity:.45;z-index:1;pointer-events:none">versão 12/11 b</p>
 </body>
 </html>
